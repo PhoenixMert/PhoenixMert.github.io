@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { PrismaClient } from '@prisma/client'
+import { sendVerificationEmail } from '@/lib/resend'
+import { getServerSession } from 'next-auth/next'
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,7 +19,6 @@ export async function POST(request: NextRequest) {
     // The issue might be that we need to trigger this differently
     // Let's create a direct database verification token and see if that works
     
-    const { PrismaClient } = require('@prisma/client')
     const prisma = new PrismaClient()
     
     // Create a verification token manually to test
@@ -37,8 +38,8 @@ export async function POST(request: NextRequest) {
       console.log("✅ Manual verification token created:", token)
       
       // Now try to send the email manually
-      const { sendVerificationEmail } = require('@/lib/resend')
-      const verificationUrl = `${process.env.NEXTAUTH_URL}/api/auth/callback/email?callbackUrl=${encodeURIComponent(process.env.NEXTAUTH_URL)}&token=${token}&email=${encodeURIComponent(email)}`
+      const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+      const verificationUrl = `${baseUrl}/api/auth/callback/email?callbackUrl=${encodeURIComponent(baseUrl)}&token=${token}&email=${encodeURIComponent(email)}`
       
       await sendVerificationEmail(email, verificationUrl)
       

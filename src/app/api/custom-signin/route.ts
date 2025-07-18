@@ -44,7 +44,8 @@ export async function POST(request: NextRequest) {
     console.log("✅ Verification token created for:", email)
     
     // Create verification URL
-    const verificationUrl = `${process.env.NEXTAUTH_URL}/api/auth/callback/email?callbackUrl=${encodeURIComponent(process.env.NEXTAUTH_URL + '/marketplace')}&token=${token}&email=${encodeURIComponent(email)}`
+    const baseUrl = process.env.NEXTAUTH_URL || 'https://bilkent-marketplace.tugrulmert.me'
+    const verificationUrl = `${baseUrl}/api/auth/callback/email?callbackUrl=${encodeURIComponent(baseUrl + '/marketplace')}&token=${token}&email=${encodeURIComponent(email)}`
     
     // Send email
     await sendVerificationEmail(email, verificationUrl)

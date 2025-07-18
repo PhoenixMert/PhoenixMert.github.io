@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
 import { sendVerificationEmail } from '@/lib/resend'
+import { prisma } from '@/lib/prisma'
 
 // Custom authentication endpoint for Bilkent University email verification
-const prisma = new PrismaClient()
 
 export async function POST(request: NextRequest) {
   try {
@@ -52,8 +51,6 @@ export async function POST(request: NextRequest) {
     
     console.log("✅ Custom verification email sent to:", email)
     
-    await prisma.$disconnect()
-    
     return NextResponse.json({ 
       success: true, 
       message: "Verification email sent! Check your inbox."
@@ -66,7 +63,6 @@ export async function POST(request: NextRequest) {
       message: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : 'No stack trace'
     })
-    await prisma.$disconnect()
     return NextResponse.json({ 
       error: "Failed to send verification email. Please try again.",
       debug: process.env.NODE_ENV === 'development' ? String(error) : undefined

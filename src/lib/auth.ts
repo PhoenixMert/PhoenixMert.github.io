@@ -1,44 +1,9 @@
-import { AdapterUser } from "next-auth/adapters"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import EmailProvider from "next-auth/providers/email"
 import { sendVerificationEmail } from "./resend"
 import { prisma } from "./prisma"
 
 console.log("🔧 Auth config loaded - Resend integration active")
-
-// Type definitions for callbacks
-interface SignInParams {
-  user: AdapterUser | User;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  account: any | null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  profile?: any;
-  email?: { verificationRequest?: boolean };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  credentials?: Record<string, any>;
-}
-
-interface SessionParams {
-  session: {
-    user?: {
-      id?: string;
-      email?: string | null;
-      name?: string | null;
-      image?: string | null;
-    };
-    expires?: string;
-  };
-  user: AdapterUser;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  token?: any;
-}
-
-interface User {
-  id: string;
-  email?: string | null;
-  name?: string | null;
-  image?: string | null;
-}
 
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
@@ -75,11 +40,8 @@ export const authOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile }: { 
-      user: AdapterUser | User; 
-      account: { provider?: string; type?: string } | null; 
-      profile?: Record<string, unknown>; 
-    }) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async signIn({ user, account, profile }: any) {
       try {
         console.log("🔐 SignIn callback triggered");
         console.log("👤 User:", JSON.stringify(user, null, 2));
@@ -106,7 +68,8 @@ export const authOptions = {
         return false;
       }
     },
-    async session({ session, user }: SessionParams) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async session({ session, user }: any) {
       console.log("📋 Session callback triggered for:", user.id);
       if (session.user) {
         session.user.id = user.id
@@ -134,13 +97,15 @@ export const authOptions = {
   },
   debug: true, // Enable debug mode to see detailed logs
   logger: {
-    error(code: string, metadata?: Record<string, unknown>) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    error(code: string, metadata?: any) {
       console.error("🚨 NextAuth Error:", code, metadata)
     },
     warn(code: string) {
       console.warn("⚠️ NextAuth Warning:", code)
     },
-    debug(code: string, metadata?: Record<string, unknown>) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    debug(code: string, metadata?: any) {
       console.log("🔍 NextAuth Debug:", code, metadata)
     }
   }

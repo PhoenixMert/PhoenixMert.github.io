@@ -52,7 +52,7 @@ export const authOptions = {
           pass: "fake-pass"
         }
       },
-      from: "Bilkent Marketplace <noreply@yourdomain.com>",
+      from: "Bilkent Marketplace <noreply@bilkent-marketplace.tugrulmert.me>",
       // Use Resend API instead of SMTP
       sendVerificationRequest: async ({ identifier: email, url }) => {
         console.log("🚨 RESEND VERIFICATION REQUEST CALLED!");

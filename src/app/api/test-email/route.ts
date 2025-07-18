@@ -45,9 +45,9 @@ export async function POST(request: NextRequest) {
 // Also support GET for quick testing
 export async function GET() {
   try {
-    const testEmail = "test@ug.bilkent.edu.tr"
+    const testEmail = "test@ug.bilkent.edu.tr" // Test with Bilkent email
     
-    console.log("🧪 GET request - Testing Resend with email:", testEmail)
+    console.log("🧪 GET request - Testing Resend with custom domain for email:", testEmail)
 
     await sendEmail({
       to: testEmail,

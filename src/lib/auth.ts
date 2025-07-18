@@ -53,6 +53,12 @@ export const authOptions = {
         console.log("🔗 URL:", url);
         console.log("🔧 Provider:", provider);
         
+        // Validate email domain before sending
+        if (!email.endsWith("@ug.bilkent.edu.tr")) {
+          console.log("❌ Email verification blocked - not Bilkent domain:", email);
+          throw new Error("Only Bilkent University email addresses are allowed");
+        }
+        
         try {
           console.log("🚀 Resend: Attempting to send email to:", email);
           
@@ -69,42 +75,31 @@ export const authOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account, email }: SignInParams) {
+    async signIn({ user, account, profile }: { user: any; account: any; profile?: any }) {
       try {
         console.log("🔐 SignIn callback triggered");
-        console.log("👤 User object:", JSON.stringify(user, null, 2));
-        console.log("📧 Account object:", JSON.stringify(account, null, 2));
-        console.log("✉️ Email object:", JSON.stringify(email, null, 2));
+        console.log("👤 User:", JSON.stringify(user, null, 2));
+        console.log("📧 Account:", JSON.stringify(account, null, 2));
+        console.log("🔍 Profile:", JSON.stringify(profile, null, 2));
         
-        // Handle email verification requests differently
-        if (email?.verificationRequest) {
-          console.log("📬 Email verification request detected");
-          // For email verification, we need to check the identifier from the email object
-          const emailAddress = user.email;
-          console.log("📧 Email being verified:", emailAddress);
-          
-          if (emailAddress && !emailAddress.endsWith("@ug.bilkent.edu.tr")) {
-            console.log("❌ Email verification rejected - not Bilkent domain:", emailAddress);
-            return false;
-          }
-          
-          console.log("✅ Email verification accepted:", emailAddress);
+        // For email provider, always allow sign-in and let NextAuth handle the verification
+        if (account?.provider === "email") {
+          console.log("📧 Email provider detected - allowing NextAuth to handle verification");
           return true;
         }
         
-        // Handle regular sign-in
-        console.log("🔑 Regular sign-in detected");
+        // For other providers, check email domain
         if (user.email && !user.email.endsWith("@ug.bilkent.edu.tr")) {
-          console.log("❌ Sign-in rejected - not Bilkent domain:", user.email);
-          return false
+          console.log("❌ Email rejected - not Bilkent domain:", user.email);
+          return false;
         }
         
         console.log("✅ Sign-in accepted:", user.email);
-        return true
+        return true;
       } catch (error) {
         console.error("❌ SignIn callback error:", error);
         console.error("❌ Error stack:", error instanceof Error ? error.stack : 'No stack trace');
-        return false
+        return false;
       }
     },
     async session({ session, user }: SessionParams) {

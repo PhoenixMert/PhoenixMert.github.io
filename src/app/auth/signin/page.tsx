@@ -24,8 +24,8 @@ export default function SignIn() {
     }
 
     try {
-      // Temporarily use temp-signin endpoint due to database connectivity issues
-      const response = await fetch("/api/temp-signin", {
+      // Use temporary signin endpoint that bypasses database
+      const response = await fetch("/api/temp-signin-no-db", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

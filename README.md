@@ -1,36 +1,132 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Bilkent University Marketplace
+
+A trusted marketplace platform for Bilkent University students to buy and sell second-hand items safely within the campus community.
+
+## Features
+
+- **Secure Authentication**: Only verified Bilkent University students with @ug.bilkent.edu.tr emails can access the platform
+- **Item Listings**: Students can list books, electronics, supplies, and other items for sale
+- **Purchase Requests**: Buyers can send purchase requests to sellers instead of direct payments
+- **Contact Facilitation**: Once a request is accepted, buyers get seller contact information to arrange meetups
+- **Campus-Focused**: Designed specifically for the Bilkent University community
+
+## Technology Stack
+
+- **Frontend**: Next.js 15 with App Router
+- **Authentication**: NextAuth.js with email verification
+- **Database**: Prisma ORM with SQLite (development)
+- **Styling**: Tailwind CSS
+- **Icons**: Lucide React
+- **TypeScript**: For type safety
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18+ installed
+- npm, yarn, or pnpm package manager
+
+### Installation
+
+1. Clone the repository
+2. Install dependencies:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. Set up environment variables:
+Create a `.env` file in the root directory and configure:
+```env
+DATABASE_URL="file:./dev.db"
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your-super-secret-key-change-this-in-production
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# Email Configuration (for email verification)
+EMAIL_SERVER_HOST=smtp.gmail.com
+EMAIL_SERVER_PORT=587
+EMAIL_SERVER_USER=your-email@gmail.com
+EMAIL_SERVER_PASSWORD=your-app-password
+EMAIL_FROM=noreply@bilkentmarketplace.com
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Set up the database:
+```bash
+npx prisma migrate dev --name init
+npx prisma generate
+```
 
-## Learn More
+5. Run the development server:
+```bash
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+├── app/
+│   ├── api/auth/          # NextAuth.js API routes
+│   ├── auth/              # Authentication pages
+│   ├── marketplace/       # Main marketplace page
+│   ├── profile/           # User profile page
+│   ├── sell/              # Item listing page
+│   └── ...
+├── components/            # Reusable UI components
+├── lib/                   # Utility functions and configurations
+└── ...
+```
 
-## Deploy on Vercel
+## How It Works
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. **Sign Up**: Students register with their Bilkent University email address
+2. **Email Verification**: Users receive a verification link via email
+3. **Browse & List**: Users can browse existing items or list their own
+4. **Purchase Requests**: Interested buyers send purchase requests to sellers
+5. **Contact Exchange**: When a request is accepted, contact information is shared
+6. **Meet & Exchange**: Students arrange to meet on campus for the transaction
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Development Roadmap
+
+### Phase 1 (Current)
+- [x] User authentication with Bilkent email restriction
+- [x] Basic UI and navigation
+- [x] Item listing form
+- [x] Marketplace browsing page
+- [ ] Database integration for items
+- [ ] Purchase request system
+
+### Phase 2 (Future)
+- [ ] Image upload functionality
+- [ ] Real-time messaging system
+- [ ] Advanced search and filtering
+- [ ] User ratings and reviews
+- [ ] Email notifications
+- [ ] Mobile responsive improvements
+
+### Phase 3 (Advanced)
+- [ ] Payment integration (if needed)
+- [ ] Admin panel
+- [ ] Analytics and reporting
+- [ ] Mobile app
+- [ ] Advanced security features
+
+## Contributing
+
+This is a student project for Bilkent University. Contributions from Bilkent students are welcome!
+
+## Security & Privacy
+
+- Only Bilkent University students can access the platform
+- Email verification is required for all accounts
+- No payment processing is handled on the platform initially
+- Contact information is only shared after mutual agreement
+
+## Support
+
+For questions or support, contact the development team or create an issue in this repository.
+
+## License
+
+This project is created for educational purposes for Bilkent University students.

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auth Test</title>
+</head>
+<body>
+    <h2>Manual Auth Test</h2>
+    <form id="authForm">
+        <input type="email" id="email" placeholder="Enter Bilkent email" value="test@ug.bilkent.edu.tr">
+        <button type="submit">Sign In</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('authForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const resultDiv = document.getElementById('result');
+            
+            try {
+                // Get CSRF token
+                const csrfResponse = await fetch('/api/auth/csrf');
+                const csrfData = await csrfResponse.json();
+                
+                // Submit form
+                const formData = new FormData();
+                formData.append('email', email);
+                formData.append('csrfToken', csrfData.csrfToken);
+                
+                const response = await fetch('/api/auth/signin/email', {
+                    method: 'POST',
+                    body: formData,
+                    redirect: 'manual'
+                });
+                
+                resultDiv.innerHTML = `
+                    <p>Status: ${response.status}</p>
+                    <p>Headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()), null, 2)}</p>
+                `;
+                
+                if (response.status === 302) {
+                    const location = response.headers.get('location');
+                    if (location && location.includes('verify-request')) {
+                        resultDiv.innerHTML += '<p style="color: green;">✅ Sign-in successful! Check server logs for email sending.</p>';
+                    } else {
+                        resultDiv.innerHTML += `<p style="color: orange;">⚠️ Redirected to: ${location}</p>`;
+                    }
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: red;">❌ Error: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

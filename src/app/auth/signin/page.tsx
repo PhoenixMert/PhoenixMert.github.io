@@ -24,8 +24,8 @@ export default function SignIn() {
     }
 
     try {
-      // Use our custom signin endpoint instead of NextAuth
-      const response = await fetch("/api/custom-signin", {
+      // Temporarily use temp-signin endpoint due to database connectivity issues
+      const response = await fetch("/api/temp-signin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

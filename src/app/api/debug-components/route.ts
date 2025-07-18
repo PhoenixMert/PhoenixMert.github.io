@@ -5,6 +5,7 @@ export async function POST(request: NextRequest) {
     console.log("🔍 Testing individual components...")
     
     const { email } = await request.json()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const results: any = {}
     
     // Test 1: Basic functionality

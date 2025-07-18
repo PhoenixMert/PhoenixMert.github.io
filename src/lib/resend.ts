@@ -1,11 +1,7 @@
-import sgMail from '@sendgrid/mail'
+import { Resend } from 'resend'
 
-// Set SendGrid API key
-if (process.env.SENDGRID_API_KEY) {
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY)
-} else {
-  console.warn("⚠️ SENDGRID_API_KEY not found in environment variables")
-}
+// Initialize Resend
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 export interface EmailOptions {
   to: string
@@ -15,19 +11,23 @@ export interface EmailOptions {
 }
 
 export async function sendEmail(options: EmailOptions) {
-  const msg = {
-    to: options.to,
-    from: options.from || process.env.EMAIL_FROM || 'noreply@yourdomain.com',
-    subject: options.subject,
-    html: options.html,
-  }
-
   try {
-    const result = await sgMail.send(msg)
-    console.log("✅ SendGrid: Email sent successfully to", options.to)
-    return { success: true, statusCode: result[0].statusCode }
+    const { data, error } = await resend.emails.send({
+      from: options.from || process.env.EMAIL_FROM || 'marketplace@bilkent-marketplace.tugrulmert.me',
+      to: [options.to],
+      subject: options.subject,
+      html: options.html,
+    })
+
+    if (error) {
+      console.error("❌ Resend: Failed to send email:", error)
+      throw error
+    }
+
+    console.log("✅ Resend: Email sent successfully to", options.to, "- ID:", data?.id)
+    return { success: true, id: data?.id }
   } catch (error) {
-    console.error("❌ SendGrid: Failed to send email:", error)
+    console.error("❌ Resend: Failed to send email:", error)
     throw error
   }
 }

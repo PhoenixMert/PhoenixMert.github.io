@@ -1,64 +1,81 @@
-// Test API route to directly test email sending
-import { NextResponse } from 'next/server'
-import sgMail from '@sendgrid/mail'
+import { NextRequest, NextResponse } from 'next/server'
+import { sendEmail } from '../../../lib/resend'
 
-// Set SendGrid API key
-if (process.env.SENDGRID_API_KEY) {
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY)
-} else {
-  console.warn("⚠️ SENDGRID_API_KEY not found in environment variables")
-}
-
-export async function GET() {
-  console.log("🧪 Direct email test triggered")
-  console.log("📧 SendGrid API key present:", !!process.env.SENDGRID_API_KEY)
-  
+export async function POST(request: NextRequest) {
   try {
-    const testEmail = "test@ug.bilkent.edu.tr"  // Use a Bilkent email for testing
-    const testUrl = process.env.NEXTAUTH_URL || "http://localhost:3001"
+    const { email } = await request.json()
     
-    console.log("🚀 Attempting to send test email to:", testEmail)
-    
-    const msg = {
-      to: testEmail,
-      from: process.env.EMAIL_FROM || 'noreply@yourdomain.com', // Use environment variable
-      subject: '🧪 Direct Email Test - Bilkent Marketplace',
-      html: `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <title>Email Test</title>
-        </head>
-        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h1 style="color: #667eea;">Direct Email Test</h1>
-          <p>This is a direct test of the SendGrid email sending functionality.</p>
-          <p>Test URL: <a href="${testUrl}" style="color: #667eea;">${testUrl}</a></p>
-          <p>If you can see this, the SendGrid email sending is working! 🎉</p>
-        </body>
-        </html>
-      `,
+    if (!email) {
+      return NextResponse.json({ error: 'Email is required' }, { status: 400 })
     }
-    
-    const result = await sgMail.send(msg)
-    
-    console.log("✅ Email sent successfully!")
-    console.log("📧 SendGrid Status:", result[0].statusCode)
-    
+
+    console.log("🧪 Testing Resend with email:", email)
+
+    await sendEmail({
+      to: email,
+      subject: '🧪 Test Email from Bilkent Marketplace',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #667eea;">🎉 Email Service Test Successful!</h2>
+          <p>This is a test email from your Bilkent Marketplace.</p>
+          <p><strong>✅ Resend is working correctly!</strong></p>
+          <p>You can now proceed with setting up your email authentication.</p>
+          <hr>
+          <p style="color: #666; font-size: 14px;">
+            Sent from Bilkent Marketplace<br>
+            ${new Date().toLocaleString()}
+          </p>
+        </div>
+      `
+    })
+
     return NextResponse.json({ 
       success: true, 
-      statusCode: result[0].statusCode,
-      message: "Email sent successfully via SendGrid!"
+      message: 'Test email sent successfully via Resend!' 
     })
   } catch (error) {
-    console.error("❌ Failed to send email:", error)
+    console.error('❌ Test email failed:', error)
     return NextResponse.json({ 
-      error: "Failed to send email", 
-      details: error instanceof Error ? error.message : String(error)
+      error: 'Failed to send test email',
+      details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 })
   }
 }
 
-export async function POST() {
-  return GET() // Allow both GET and POST for testing
+// Also support GET for quick testing
+export async function GET() {
+  try {
+    const testEmail = "test@ug.bilkent.edu.tr"
+    
+    console.log("🧪 GET request - Testing Resend with email:", testEmail)
+
+    await sendEmail({
+      to: testEmail,
+      subject: '🧪 Test Email from Bilkent Marketplace (GET)',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #667eea;">🎉 Email Service Test Successful!</h2>
+          <p>This is a test email from your Bilkent Marketplace (GET request).</p>
+          <p><strong>✅ Resend is working correctly!</strong></p>
+          <p>You can now proceed with setting up your email authentication.</p>
+          <hr>
+          <p style="color: #666; font-size: 14px;">
+            Sent from Bilkent Marketplace<br>
+            ${new Date().toLocaleString()}
+          </p>
+        </div>
+      `
+    })
+
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Test email sent successfully via Resend!' 
+    })
+  } catch (error) {
+    console.error('❌ Test email failed:', error)
+    return NextResponse.json({ 
+      error: 'Failed to send test email',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 })
+  }
 }

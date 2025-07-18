@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 import { sendVerificationEmail } from '@/lib/resend'
 
+// Custom authentication endpoint for Bilkent University email verification
 const prisma = new PrismaClient()
 
 export async function POST(request: NextRequest) {

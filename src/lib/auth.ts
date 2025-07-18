@@ -9,14 +9,21 @@ export const authOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     EmailProvider({
-      server: process.env.EMAIL_SERVER || "smtp://fake:fake@localhost:587",
       from: process.env.EMAIL_FROM,
       // Use Resend API instead of SMTP
       sendVerificationRequest: async ({ identifier: email, url, provider }) => {
         console.log("🚨 RESEND VERIFICATION REQUEST CALLED!");
         console.log("📧 Email:", email);
-        console.log("🔗 URL:", url);
+        console.log("🔗 Original URL:", url);
         console.log("🔧 Provider:", provider);
+        
+        // Fix the URL if NextAuth is generating the wrong format
+        let correctedUrl = url;
+        if (url.includes('/api/auth/signin/email')) {
+          // Convert signin URL to callback URL
+          correctedUrl = url.replace('/api/auth/signin/email', '/api/auth/callback/email');
+          console.log("🔧 URL corrected from signin to callback:", correctedUrl);
+        }
         
         // Validate email domain before sending
         if (!email.endsWith("@ug.bilkent.edu.tr")) {
@@ -26,8 +33,9 @@ export const authOptions = {
         
         try {
           console.log("🚀 Resend: Attempting to send email to:", email);
+          console.log("🔗 Using URL:", correctedUrl);
           
-          await sendVerificationEmail(email, url);
+          await sendVerificationEmail(email, correctedUrl);
           
           console.log("✅ Resend: Email sent successfully!");
           console.log("📩 Sent to:", email);

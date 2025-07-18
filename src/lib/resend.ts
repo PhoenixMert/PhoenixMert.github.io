@@ -1,7 +1,7 @@
 import { Resend } from 'resend'
 
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Initialize Resend with fallback for build time
+const resend = new Resend(process.env.RESEND_API_KEY || 'fallback-key-for-build')
 
 export interface EmailOptions {
   to: string
@@ -11,6 +11,12 @@ export interface EmailOptions {
 }
 
 export async function sendEmail(options: EmailOptions) {
+  // Check if we have a valid API key at runtime
+  if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === 'fallback-key-for-build') {
+    console.error("❌ RESEND_API_KEY not configured properly")
+    throw new Error("Resend API key not configured")
+  }
+
   try {
     const { data, error } = await resend.emails.send({
       from: options.from || process.env.EMAIL_FROM || 'marketplace@bilkent-marketplace.tugrulmert.me',

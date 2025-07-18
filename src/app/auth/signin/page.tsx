@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { signIn } from "next-auth/react"
 import Link from "next/link"
 import { Mail, ArrowLeft } from "lucide-react"
 
@@ -25,15 +24,21 @@ export default function SignIn() {
     }
 
     try {
-      const result = await signIn("email", {
-        email,
-        redirect: false,
+      // Use our custom signin endpoint instead of NextAuth
+      const response = await fetch("/api/custom-signin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
       })
 
-      if (result?.error) {
-        setError("Failed to send verification email. Please try again.")
+      const data = await response.json()
+
+      if (response.ok) {
+        setMessage(data.message || "Check your email for a verification link!")
       } else {
-        setMessage("Check your email for a verification link!")
+        setError(data.error || "Failed to send verification email. Please try again.")
       }
     } catch {
       setError("Something went wrong. Please try again.")

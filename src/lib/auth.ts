@@ -69,15 +69,25 @@ export const authOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user }: SignInParams) {
-      console.log("🔐 SignIn callback triggered for:", user.email);
-      // Only allow Bilkent University email addresses
-      if (user.email && !user.email.endsWith("@ug.bilkent.edu.tr")) {
-        console.log("❌ Email rejected - not Bilkent domain:", user.email);
+    async signIn({ user, account, email }: SignInParams) {
+      try {
+        console.log("🔐 SignIn callback triggered");
+        console.log("👤 User:", user.email);
+        console.log("📧 Account type:", account?.type);
+        console.log("✉️ Email verification:", email?.verificationRequest);
+        
+        // Only allow Bilkent University email addresses
+        if (user.email && !user.email.endsWith("@ug.bilkent.edu.tr")) {
+          console.log("❌ Email rejected - not Bilkent domain:", user.email);
+          return false
+        }
+        
+        console.log("✅ Email accepted:", user.email);
+        return true
+      } catch (error) {
+        console.error("❌ SignIn callback error:", error);
         return false
       }
-      console.log("✅ Email accepted:", user.email);
-      return true
     },
     async session({ session, user }: SessionParams) {
       console.log("📋 Session callback triggered for:", user.id);
@@ -109,4 +119,19 @@ export const authOptions = {
   session: {
     strategy: "database" as const,
   },
+  debug: process.env.NODE_ENV === "development",
+  logger: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    error(code: any, metadata: any) {
+      console.error("🚨 NextAuth Error:", code, metadata)
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    warn(code: any) {
+      console.warn("⚠️ NextAuth Warning:", code)
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    debug(code: any, metadata: any) {
+      console.log("🔍 NextAuth Debug:", code, metadata)
+    }
+  }
 }

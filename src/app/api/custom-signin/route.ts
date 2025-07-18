@@ -61,9 +61,15 @@ export async function POST(request: NextRequest) {
     
   } catch (error) {
     console.error("❌ Custom signin error:", error)
+    console.error("❌ Error details:", {
+      name: error instanceof Error ? error.name : 'Unknown',
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : 'No stack trace'
+    })
     await prisma.$disconnect()
     return NextResponse.json({ 
-      error: "Failed to send verification email. Please try again." 
+      error: "Failed to send verification email. Please try again.",
+      debug: process.env.NODE_ENV === 'development' ? String(error) : undefined
     }, { status: 500 })
   }
 }

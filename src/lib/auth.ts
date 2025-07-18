@@ -75,7 +75,11 @@ export const authOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile }: { user: any; account: any; profile?: any }) {
+    async signIn({ user, account, profile }: { 
+      user: AdapterUser | User; 
+      account: { provider?: string; type?: string } | null; 
+      profile?: Record<string, unknown>; 
+    }) {
       try {
         console.log("🔐 SignIn callback triggered");
         console.log("👤 User:", JSON.stringify(user, null, 2));
@@ -107,21 +111,17 @@ export const authOptions = {
       if (session.user) {
         session.user.id = user.id
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return session as any
+      return session
     },
   },
   events: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async signIn(message: any) {
+    async signIn(message: { user: { email?: string | null } }) {
       console.log("🎉 SignIn event:", message);
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async createUser(message: any) {
+    async createUser(message: { user: { email?: string | null } }) {
       console.log("👤 CreateUser event:", message);
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async session(message: any) {
+    async session(message: { session: { user?: { email?: string | null } } }) {
       console.log("📋 Session event:", message);
     },
   },
@@ -134,16 +134,13 @@ export const authOptions = {
   },
   debug: true, // Enable debug mode to see detailed logs
   logger: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    error(code: any, metadata: any) {
+    error(code: string, metadata?: Record<string, unknown>) {
       console.error("🚨 NextAuth Error:", code, metadata)
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    warn(code: any) {
+    warn(code: string) {
       console.warn("⚠️ NextAuth Warning:", code)
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    debug(code: any, metadata: any) {
+    debug(code: string, metadata?: Record<string, unknown>) {
       console.log("🔍 NextAuth Debug:", code, metadata)
     }
   }

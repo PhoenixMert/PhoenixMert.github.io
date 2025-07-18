@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const now = new Date();
     const tokenInfo = tokens.map(token => ({
       identifier: token.identifier,
-      token: token.token.substring(0, 8) + '...', // Only show first 8 chars for security
+      token: token.token, // Show full token for debugging
       expires: token.expires.toISOString(),
       isExpired: token.expires < now,
       createdAgo: Math.floor((now.getTime() - token.expires.getTime() + (24 * 60 * 60 * 1000)) / (1000 * 60)) + ' minutes ago'

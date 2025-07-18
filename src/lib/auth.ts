@@ -72,20 +72,38 @@ export const authOptions = {
     async signIn({ user, account, email }: SignInParams) {
       try {
         console.log("🔐 SignIn callback triggered");
-        console.log("👤 User:", user.email);
-        console.log("📧 Account type:", account?.type);
-        console.log("✉️ Email verification:", email?.verificationRequest);
+        console.log("👤 User object:", JSON.stringify(user, null, 2));
+        console.log("📧 Account object:", JSON.stringify(account, null, 2));
+        console.log("✉️ Email object:", JSON.stringify(email, null, 2));
         
-        // Only allow Bilkent University email addresses
+        // Handle email verification requests differently
+        if (email?.verificationRequest) {
+          console.log("📬 Email verification request detected");
+          // For email verification, we need to check the identifier from the email object
+          const emailAddress = user.email;
+          console.log("📧 Email being verified:", emailAddress);
+          
+          if (emailAddress && !emailAddress.endsWith("@ug.bilkent.edu.tr")) {
+            console.log("❌ Email verification rejected - not Bilkent domain:", emailAddress);
+            return false;
+          }
+          
+          console.log("✅ Email verification accepted:", emailAddress);
+          return true;
+        }
+        
+        // Handle regular sign-in
+        console.log("🔑 Regular sign-in detected");
         if (user.email && !user.email.endsWith("@ug.bilkent.edu.tr")) {
-          console.log("❌ Email rejected - not Bilkent domain:", user.email);
+          console.log("❌ Sign-in rejected - not Bilkent domain:", user.email);
           return false
         }
         
-        console.log("✅ Email accepted:", user.email);
+        console.log("✅ Sign-in accepted:", user.email);
         return true
       } catch (error) {
         console.error("❌ SignIn callback error:", error);
+        console.error("❌ Error stack:", error instanceof Error ? error.stack : 'No stack trace');
         return false
       }
     },
@@ -119,7 +137,7 @@ export const authOptions = {
   session: {
     strategy: "database" as const,
   },
-  debug: process.env.NODE_ENV === "development",
+  debug: true, // Enable debug mode to see detailed logs
   logger: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     error(code: any, metadata: any) {

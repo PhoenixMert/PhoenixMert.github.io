@@ -1,12 +1,19 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     console.log("🔍 DEBUG: Checking authentication configuration...")
 
-    const debugInfo = {
+    const debugInfo: {
+      timestamp: string;
+      environment: string | undefined;
+      databaseStatus: string;
+      requiredAdapterMethods: string[];
+      missingAdapterMethods: string[];
+      envVars: Record<string, string>;
+    } = {
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV,
       databaseStatus: "unknown",
